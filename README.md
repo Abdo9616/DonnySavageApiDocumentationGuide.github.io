@@ -10,7 +10,7 @@ Programmatic access to Discord bot functionality and server data via REST API.
   `x-api-key: YOUR_API_KEY`
 - **Base URL**:  
   `http://bot.api.donnysavagebot.publicvm.com/`
-- **Learn More**: [Full Documentation](https://abdo129.github.io/DonnySavageApiDocumentationGuide.github.io/)
+- **Learn More**: [Full Documentation](https://abdo9616.github.io/DonnySavageApiDocumentationGuide.github.io/)
 
 ## 🚀 Getting Started
 1. Generate API key via Discord command
