@@ -135,6 +135,45 @@
                 
                 localStorage.setItem('sidebarCollapsed', isCollapsing);
             });
+
+            // Copy button functionality for code examples
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const codeElement = button.parentElement.querySelector('code');
+                    const codeText = codeElement.textContent || codeElement.innerText;
+                    
+                    navigator.clipboard.writeText(codeText).then(() => {
+                        // Show success feedback
+                        const originalText = button.innerHTML;
+                        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        button.style.backgroundColor = '#10b981';
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.style.backgroundColor = '';
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = codeText;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
+                        // Show success feedback even with fallback
+                        const originalText = button.innerHTML;
+                        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        button.style.backgroundColor = '#10b981';
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.style.backgroundColor = '';
+                        }, 2000);
+                    });
+                });
+            });
         });
     </script>
     <meta charset="UTF-8">
@@ -913,6 +952,38 @@
             margin-top: 10px;
         }
         
+        /* Code block wrapper for copy button */
+        .code-block-wrapper {
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .copy-button:active {
+            transform: translateY(0);
+        }
+        
         @media (max-width: 768px) {
             body {
                 padding: 15px;
@@ -963,6 +1034,11 @@
             .content-wrapper {
                 margin-left: 0 !important;
                 padding-left: 0 !important;
+            }
+            
+            .copy-button {
+                padding: 5px 8px;
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -1405,7 +1481,8 @@ http://bot.api.donnysavagebot.publicvm.com/api/secure-data</code></pre>
             
             <div id="javascript" class="tab-content active">
                 <h3>JavaScript (Node.js)</h3>
-                <pre><code>// Member Verification Example
+                <div class="code-block-wrapper">
+                    <pre><code>// Member Verification Example
 const verifyMember = async (userId, getCount = false) => {
   try {
     const bodyData = getCount ? { userId: 'count' } : { userId };
@@ -1478,11 +1555,16 @@ const getBotStats = async () => {
 getBotStats().then(stats => {
   console.log(`Bot Stats: ${stats.guilds} servers, ${stats.users} users`);
 });</code></pre>
+                    <button class="copy-button">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
             </div>
             
             <div id="python" class="tab-content">
                 <h3>Python</h3>
-                <pre><code>import requests
+                <div class="code-block-wrapper">
+                    <pre><code>import requests
 import json
 
 # Replace with your actual API key
@@ -1577,11 +1659,16 @@ if __name__ == '__main__':
         print(f'Bot Stats: {stats["guilds"]} servers, {stats["users"]} users')
     except Exception:
         print('Failed to get bot stats')</code></pre>
+                    <button class="copy-button">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
             </div>
             
             <div id="curl" class="tab-content">
                 <h3>cURL</h3>
-                <pre><code># Verify API key
+                <div class="code-block-wrapper">
+                    <pre><code># Verify API key
 curl.exe -H "x-api-key: YOUR_API_KEY" ^
   http://bot.api.donnysavagebot.publicvm.com/api/secure-data
 
@@ -1600,6 +1687,10 @@ curl.exe -X POST "http://bot.api.donnysavagebot.publicvm.com/api/verify-member" 
   -H "x-api-key: YOUR_API_KEY" ^
   -H "Content-Type: application/json" ^
   -d "{\"userId\": \"count\"}"</code></pre>
+                    <button class="copy-button">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
             </div>
         </section>
         
