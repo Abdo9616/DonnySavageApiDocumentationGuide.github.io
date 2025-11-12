@@ -1483,6 +1483,9 @@ http://bot.api.donnysavagebot.publicvm.com/api/secure-data</code></pre>
                 <h3>JavaScript (Node.js)</h3>
                 <div class="code-block-wrapper">
                     <pre><code>// Member Verification Example
+
+const API_KEY = 'YOUR_API_KEY';
+
 const verifyMember = async (userId, getCount = false) => {
   try {
     const bodyData = getCount ? { userId: 'count' } : { userId };
@@ -1490,7 +1493,7 @@ const verifyMember = async (userId, getCount = false) => {
     const response = await fetch('http://bot.api.donnysavagebot.publicvm.com/api/verify-member', {
       method: 'POST',
       headers: {
-        'x-api-key': 'YOUR_API_KEY',
+        'x-api-key': API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(bodyData)
@@ -1539,7 +1542,7 @@ const getBotStats = async () => {
   try {
     const response = await fetch('http://bot.api.donnysavagebot.publicvm.com/api/bot-stats', {
       headers: {
-        'x-api-key': 'YOUR_API_KEY'
+        'x-api-key': API_KEY
       }
     });
     
@@ -1957,4 +1960,5 @@ curl.exe -X POST "http://bot.api.donnysavagebot.publicvm.com/api/verify-member" 
         }
     </script>
 </body>
+
 </html>
