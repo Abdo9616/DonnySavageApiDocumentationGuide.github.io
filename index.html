@@ -1,872 +1,897 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Theme toggle functionality
-            const currentTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            
-            // Set initial icon based on theme
-            const initialIcon = currentTheme === 'light' ? '🌙' : '☀️';
-            document.getElementById('theme-toggle').innerHTML = initialIcon;
-            
-            document.getElementById('theme-toggle').addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                
-                // Update button icon
-                const icon = newTheme === 'light' ? '🌙' : '☀️';
-                document.getElementById('theme-toggle').innerHTML = icon;
-            });
-            
-            // Endpoint navigation
-            document.querySelectorAll('.endpoint-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = e.target.getAttribute('href').substring(1);
-                    document.getElementById(targetId).scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                });
-            });
-            
-            // Tab functionality
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs
-                    document.querySelectorAll('.tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    
-                    // Add active class to clicked tab
-                    tab.classList.add('active');
-                    
-                    // Hide all tab content
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    // Show target tab content
-                    const targetId = tab.getAttribute('data-tab');
-                    document.getElementById(targetId).classList.add('active');
-                });
-            });
-
-            // Mobile menu functionality
-            const menuBtn = document.getElementById('mobileMenuBtn');
-            const closeMenu = document.getElementById('closeMenu');
-            const sidebar = document.getElementById('sidebar');
-            const collapseBtn = document.getElementById('collapseBtn');
-            
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            });
-            
-            closeMenu.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                document.body.style.overflow = '';
-            });
-            
-            // Close menu when clicking outside on mobile
-            document.addEventListener('click', (e) => {
-                if (sidebar.classList.contains('active') && 
-                    !sidebar.contains(e.target) && 
-                    !menuBtn.contains(e.target) &&
-                    window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-            
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    if(targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if(targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 20,
-                            behavior: 'smooth'
-                        });
-                        
-                        // Close mobile menu after navigation
-                        if (window.innerWidth <= 768) {
-                            sidebar.classList.remove('active');
-                            document.body.style.overflow = '';
-                        }
-                    }
-                });
-            });
-
-            // Collapse sidebar functionality
-            const savedSidebarState = localStorage.getItem('sidebarCollapsed');
-            if (savedSidebarState === 'true') {
-                document.querySelector('.sidebar').classList.add('collapsed');
-                document.querySelector('.content-wrapper').classList.add('collapsed');
-                document.getElementById('collapseIcon').classList.remove('fa-chevron-left');
-                document.getElementById('collapseIcon').classList.add('fa-chevron-right');
-            }
-            
-            collapseBtn.addEventListener('click', () => {
-                const sidebar = document.querySelector('.sidebar');
-                const content = document.querySelector('.content-wrapper');
-                const isCollapsing = !sidebar.classList.contains('collapsed');
-                
-                sidebar.classList.toggle('collapsed');
-                content.classList.toggle('collapsed');
-                
-                const icon = document.getElementById('collapseIcon');
-                if (isCollapsing) {
-                    icon.classList.remove('fa-chevron-left');
-                    icon.classList.add('fa-chevron-right');
-                } else {
-                    icon.classList.remove('fa-chevron-right');
-                    icon.classList.add('fa-chevron-left');
-                }
-                
-                localStorage.setItem('sidebarCollapsed', isCollapsing);
-            });
-
-            // Copy button functionality for code examples
-            document.querySelectorAll('.copy-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const codeElement = button.parentElement.querySelector('code');
-                    const codeText = codeElement.textContent || codeElement.innerText;
-                    
-                    navigator.clipboard.writeText(codeText).then(() => {
-                        // Show success feedback
-                        const originalText = button.innerHTML;
-                        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                        button.style.backgroundColor = '#10b981';
-                        
-                        setTimeout(() => {
-                            button.innerHTML = originalText;
-                            button.style.backgroundColor = '';
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Failed to copy: ', err);
-                        // Fallback for older browsers
-                        const textArea = document.createElement('textarea');
-                        textArea.value = codeText;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        
-                        // Show success feedback even with fallback
-                        const originalText = button.innerHTML;
-                        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                        button.style.backgroundColor = '#10b981';
-                        
-                        setTimeout(() => {
-                            button.innerHTML = originalText;
-                            button.style.backgroundColor = '';
-                        }, 2000);
-                    });
-                });
-            });
-        });
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DonnySavage Bot API Documentation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Coolify-inspired theme with DonnySavage colors */
         :root {
-            --primary: #5865F2;
-            --primary-light: #7983f5;
-            --primary-dark: #4752c4;
-            --header-bg: #23272A;
-            --header-text: #FFFFFF;
-            --body-bg: #f9f9f9;
-            --text: #2c3e50;
-            --section-bg: #FFFFFF;
-            --footer-text: #7f8c8d;
-            --button-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            --border-radius: 10px;
-            --code-bg: #f5f7ff;
+            --primary: #4361ee;
+            --primary-light: #5a7dff;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --secondary-light: #8a2be2;
+            --accent: #f72585;
+            --header-bg: #1a1a2e;
+            --header-text: #ffffff;
+            --body-bg: #0f0f23;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --section-bg: #161b33;
+            --card-bg: #1e1e3f;
+            --border: #2d2d5a;
+            --footer-text: #94a3b8;
+            --button-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            --border-radius: 8px;
+            --code-bg: #1a1b26;
             --endpoint-get: #10b981;
             --endpoint-post: #f59e0b;
             --endpoint-put: #3b82f6;
             --endpoint-delete: #ef4444;
-            --tip-bg: rgba(16, 185, 129, 0.1);
+            --tip-bg: rgba(16, 185, 129, 0.15);
             --tip-border: #10b981;
-            --warning-bg: rgba(245, 158, 11, 0.1);
+            --warning-bg: rgba(245, 158, 11, 0.15);
             --warning-border: #f59e0b;
-            --important-bg: rgba(239, 68, 68, 0.1);
+            --important-bg: rgba(239, 68, 68, 0.15);
             --important-border: #ef4444;
-            --sidebar-bg: #1e2124;
-            --sidebar-text: #e3e5e8;
-            --sidebar-hover: #2c2f33;
+            --sidebar-bg: #161b33;
+            --sidebar-text: #cbd5e1;
+            --sidebar-hover: #2d2d5a;
+            --sidebar-active: #4361ee;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --sidebar-width: 280px;
+            --header-height: 60px;
         }
 
-        [data-theme="dark"] {
-            --primary: #7983f5;
-            --primary-light: #9aa1f8;
-            --primary-dark: #5e6ad0;
-            --header-bg: #1a1d21;
-            --header-text: #e3e5e8;
-            --body-bg: #121416;
-            --text: #e3e5e8;
-            --section-bg: #1e2124;
-            --footer-text: #a0a6ab;
-            --button-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            --code-bg: #1e2230;
-            --tip-bg: rgba(16, 185, 129, 0.15);
-            --warning-bg: rgba(245, 158, 11, 0.15);
-            --important-bg: rgba(239, 68, 68, 0.15);
-            --sidebar-bg: #121416;
-            --sidebar-text: #e3e5e8;
-            --sidebar-hover: #2c2f33;
+        [data-theme="light"] {
+            --primary: #4361ee;
+            --primary-light: #5a7dff;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --secondary-light: #8a2be2;
+            --accent: #f72585;
+            --header-bg: #ffffff;
+            --header-text: #1e293b;
+            --body-bg: #f8fafc;
+            --text: #334155;
+            --text-secondary: #64748b;
+            --section-bg: #ffffff;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --footer-text: #64748b;
+            --button-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --code-bg: #f1f5f9;
+            --tip-bg: rgba(16, 185, 129, 0.1);
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --important-bg: rgba(239, 68, 68, 0.1);
+            --sidebar-bg: #f8fafc;
+            --sidebar-text: #475569;
+            --sidebar-hover: #e2e8f0;
+            --sidebar-active: #4361ee;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
-        
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--section-bg);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
         body {
             background-color: var(--body-bg);
             color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             line-height: 1.7;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--section-bg);
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
-        
-        /* New sidebar styles */
-        .sidebar {
+
+        /* Header */
+        .header {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 260px;
-            height: 100%;
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            padding: 20px 0;
-            z-index: 1000;
-            overflow-y: auto;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease, width 0.3s ease;
-        }
-        
-        .sidebar.active {
-            transform: translateX(0);
-            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
-        }
-        
-        .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .sidebar-header h2 {
-            color: var(--primary-light);
-            font-size: 1.4rem;
-            transition: opacity 0.3s ease;
-        }
-        
-        .sidebar ul {
-            list-style: none;
-        }
-        
-        .sidebar li {
-            margin-bottom: 5px;
-        }
-        
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: var(--sidebar-text);
-            text-decoration: none;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-            font-size: 1rem;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        
-        .sidebar a:hover, .sidebar a.active {
-            background: var(--sidebar-hover);
-            border-left: 3px solid var(--primary);
-            color: white;
-        }
-        
-        .sidebar a i {
-            margin-right: 15px;
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-            min-width: 20px;
-            transition: margin 0.3s ease;
-        }
-        
-        .close-menu {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
-            border: none;
-            color: var(--primary-light);
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: none;
-        }
-        
-        /* Improved mobile menu button */
-        .mobile-menu-btn {
-            position: fixed;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 0 50% 50% 0;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--button-shadow);
-            font-size: 1.6rem;
-            z-index: 900;
-            display: none;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-menu-btn:hover {
-            transform: translateY(-50%) scale(1.1);
-            background: var(--primary-light);
-        }
-        
-        .content-wrapper {
-            transition: margin-left 0.3s ease;
-        }
-        
-        /* Collapsed sidebar styles */
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        
-        .sidebar.collapsed .sidebar-header h2,
-        .sidebar.collapsed .link-text {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            overflow: hidden;
-        }
-        
-        .sidebar.collapsed a i {
-            margin-right: 0;
-        }
-        
-        .sidebar.collapsed .collapse-btn {
-            padding: 10px;
-            justify-content: center;
-        }
-        
-        .sidebar.collapsed .collapse-btn i {
-            margin: 0;
-        }
-        
-        .content-wrapper.collapsed {
-            margin-left: 70px;
-        }
-        
-        /* Adjust content for sidebar on desktop */
-        @media (min-width: 769px) {
-            .sidebar {
-                transform: translateX(0);
-                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
-            }
-            
-            .content-wrapper {
-                margin-left: 260px;
-                padding-left: 20px;
-            }
-            
-            body {
-                padding-left: 0;
-            }
-            
-            .collapse-btn {
-                display: flex;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-menu-btn, .close-menu {
-                display: flex;
-            }
-            
-            .sidebar {
-                width: 280px;
-                box-shadow: 5px 0 15px rgba(0,0,0,0.3);
-            }
-            
-            .collapse-btn {
-                display: none;
-            }
-            
-            /* Center content vertically when menu is open */
-            .sidebar-header {
-                padding-top: 40px;
-            }
-        }
-        
-        /* Collapse button styles */
-        .collapse-btn {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--sidebar-text);
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 0 15px 15px;
-            transition: all 0.3s ease;
-            width: calc(100% - 30px);
-        }
-        
-        .collapse-btn:hover {
-            background: var(--primary-light);
-        }
-        
-        .collapse-btn i {
-            margin-right: 10px;
-            transition: transform 0.3s ease;
-        }
-        
-        header {
-            background: linear-gradient(135deg, var(--header-bg) 0%, #2c2f33 100%);
-            color: var(--header-text);
-            padding: 2.5rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 2.5rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
-        
-        header::before {
-            content: "";
-            position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            height: var(--header-height);
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        h1 {
-            color: var(--header-text);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 1.25rem;
+            color: var(--header-text);
+            text-decoration: none;
         }
-        
-        .api-header {
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .logo-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .logo-icon i {
+            display: none;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: var(--section-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        /* Main layout */
+        .main-container {
+            display: flex;
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 900;
+            transition: transform 0.3s ease;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--sidebar-bg);
+        }
+
+        /* Sidebar search box */
+        .sidebar-search {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--section-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Search dropdown styles */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--section-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1100;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .search-result-item:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .search-result-icon {
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .search-result-content {
+            flex: 1;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text);
+        }
+
+        .search-result-path {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .search-result-highlight {
+            background-color: rgba(67, 97, 238, 0.2);
+            padding: 0 2px;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
+        .no-results {
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .sidebar-section {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0.5rem 1.5rem 0.5rem;
+            letter-spacing: 0.05em;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
         }
-        
+
+        .sidebar-section-title:hover {
+            color: var(--text);
+        }
+
+        .toggle-icon {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-section-title.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-links {
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .sidebar-links.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-link:hover {
+            background: var(--sidebar-hover);
+            color: var(--text);
+        }
+
+        .sidebar-link.active {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--sidebar-active);
+            border-left-color: var(--sidebar-active);
+        }
+
+        .sidebar-link i {
+            margin-right: 0.75rem;
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            scroll-margin-top: calc(var(--header-height) + 1rem);
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
         .last-updated {
+            position: absolute;
+            top: 0;
+            right: 0;
             background: rgba(255,255,255,0.1);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-secondary);
         }
-        
-        .last-updated::before {
-            content: "📅";
-            font-size: 1.1em;
-        }
-        
-        section {
-            background: var(--section-bg);
-            padding: 30px;
+
+        /* Cards - Improved style with better padding */
+        .card {
+            background: var(--card-bg);
             border-radius: var(--border-radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             border-left: 4px solid var(--primary);
+            width: 100%;
+            box-sizing: border-box;
         }
-        
-        section h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(88, 101, 242, 0.2);
-        }
-        
-        h3 {
-            color: var(--primary-light);
-            margin: 20px 0 15px;
-            font-size: 1.4rem;
-        }
-        
-        h4 {
-            margin: 15px 0 10px;
-            font-size: 1.1rem;
-            color: var(--primary-light);
-        }
-        
-        ul {
-            padding-left: 25px;
-            margin: 15px 0;
-        }
-        
-        li {
-            margin-bottom: 12px;
-            position: relative;
-        }
-        
-        li::before {
-            content: "•";
-            color: var(--primary);
-            font-weight: bold;
-            position: absolute;
-            left: -20px;
-        }
-        
-        code {
-            background: var(--code-bg);
-            color: var(--primary);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        pre {
-            background: var(--code-bg);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            overflow-x: auto;
-            margin: 15px 0;
-            line-height: 1.5;
-        }
-        
-        pre code {
-            background: none;
-            padding: 0;
+
+        .card h3 {
+            margin-bottom: 1rem;
             color: var(--text);
+            font-size: 1.3rem;
         }
-        
-        a {
-            color: var(--primary);
-            text-decoration: none;
-            position: relative;
+
+        .card p {
+            margin-bottom: 1rem;
         }
-        
-        a:hover {
-            text-decoration: underline;
+
+        .card ul, .card ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
         }
-        
-        footer {
-            color: var(--footer-text);
-            text-align: center;
-            margin-top: 3rem;
-            padding-top: 20px;
-            border-top: 1px solid rgba(127, 140, 141, 0.2);
-            font-size: 1rem;
+
+        .card li {
+            margin-bottom: 0.5rem;
         }
-        
-        .theme-toggle {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 55px;
-            height: 55px;
-            cursor: pointer;
+
+        .card-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: var(--button-shadow);
-            font-size: 1.6rem;
-            z-index: 1000;
-            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
         }
-        
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            background: var(--primary-light);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-        }
-        
-        .highlight {
-            background: rgba(88, 101, 242, 0.1);
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: 500;
-        }
-        
-        .section-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-        
-        .contact-methods {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .contact-item {
-            background: rgba(88, 101, 242, 0.1);
-            border-radius: 8px;
-            padding: 15px;
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
             flex: 1;
-            min-width: 200px;
-            text-align: center;
         }
-        
-        .endpoint-card {
-            background: var(--section-bg);
+
+        /* Example Project Card - Improved style */
+        .example-project {
+            background: rgba(88, 101, 242, 0.1);
             border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 1.5rem;
+            margin: 20px 0;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            width: 100%;
+            box-sizing: border-box;
         }
-        
+
+        .example-project h4 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+
+        .example-project h4::before {
+            content: "🚀";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .example-project p {
+            margin-bottom: 1rem;
+        }
+
+        .example-project ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .example-project li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Endpoint cards */
+        .endpoint-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+        }
+
         .endpoint-header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(88, 101, 242, 0.2);
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
-        
+
         .endpoint-method {
-            padding: 5px 12px;
+            padding: 0.25rem 0.75rem;
             border-radius: 4px;
-            font-weight: bold;
-            margin-right: 15px;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.8rem;
         }
-        
+
         .method-get {
             background-color: rgba(16, 185, 129, 0.15);
             color: var(--endpoint-get);
         }
-        
+
         .method-post {
             background-color: rgba(245, 158, 11, 0.15);
             color: var(--endpoint-post);
         }
-        
+
         .method-put {
             background-color: rgba(59, 130, 246, 0.15);
             color: var(--endpoint-put);
         }
-        
+
         .method-delete {
             background-color: rgba(239, 68, 68, 0.15);
             color: var(--endpoint-delete);
         }
-        
+
         .endpoint-url {
             font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
+            font-size: 1rem;
             flex-grow: 1;
+            color: var(--text);
+            word-break: break-all;
         }
-        
-        .endpoint-description {
-            margin-bottom: 15px;
+
+        /* Code blocks */
+        .code-block {
+            background: var(--code-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            width: 100%;
+            box-sizing: border-box;
         }
-        
-        .endpoint-response {
-            margin: 15px 0;
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
-        
-        .response-title {
-            font-weight: bold;
-            margin-bottom: 8px;
+
+        .code-block code {
+            color: var(--text);
+        }
+
+        .copy-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
         }
-        
-        .response-title::before {
-            content: "📤";
-            margin-right: 8px;
+
+        .copy-button:hover {
+            background: var(--primary-light);
         }
-        
-        .json-block {
-            background: var(--code-bg);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-        
-        .json-key {
-            color: #e2777a;
-        }
-        
-        .json-string {
-            color: #7ec699;
-        }
-        
-        .json-number {
-            color: #f08d49;
-        }
-        
-        .json-boolean {
-            color: #cc99cd;
-        }
-        
+
+        /* Tabs */
         .tabs {
             display: flex;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(88, 101, 242, 0.2);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
         }
-        
+
         .tab {
-            padding: 10px 15px;
+            padding: 0.75rem 1.5rem;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
-        
+
         .tab.active {
-            border-bottom: 3px solid var(--primary);
-            font-weight: bold;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
         }
-        
+
         .tab-content {
             display: none;
+            width: 100%;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
-        .endpoint-table {
+
+        /* Tables */
+        .table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 1rem 0;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
         }
-        
-        .endpoint-table th, .endpoint-table td {
-            padding: 10px;
+
+        .table th, .table td {
+            padding: 0.75rem;
             text-align: left;
-            border-bottom: 1px solid rgba(88, 101, 242, 0.1);
+            border-bottom: 1px solid var(--border);
         }
-        
-        .endpoint-table th {
-            background: rgba(88, 101, 242, 0.1);
-            color: var(--primary);
-            font-weight: bold;
+
+        .table th {
+            background: rgba(0,0,0,0.05);
+            color: var(--text);
+            font-weight: 600;
         }
-        
-        .use-case-grid {
+
+        /* Alert boxes */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            border-left: 4px solid;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .alert-tip {
+            background: var(--tip-bg);
+            border-left-color: var(--tip-border);
+        }
+
+        .alert-warning {
+            background: var(--warning-bg);
+            border-left-color: var(--warning-border);
+        }
+
+        .alert-important {
+            background: var(--important-bg);
+            border-left-color: var(--important-border);
+        }
+
+        /* Stats grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            width: 100%;
         }
-        
-        .use-case-card {
-            background: rgba(88, 101, 242, 0.05);
+
+        .stat-card {
+            background: var(--card-bg);
             border-radius: var(--border-radius);
-            padding: 20px;
-            border: 1px solid rgba(88, 101, 242, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            width: 100%;
+            box-sizing: border-box;
         }
-        
-        .use-case-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        
-        .use-case-card h4 {
-            color: var(--primary);
-            margin-bottom: 10px;
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer - Fixed to not be behind sidebar */
+        .footer {
+            background: var(--header-bg);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            width: 100%;
         }
-        
-        .use-case-card h4::before {
-            content: "🔹";
-            margin-right: 8px;
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
         }
-        
-        .api-key-card {
-            background: linear-gradient(135deg, #2c2f33, #23272A);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin: 20px 0;
+
+        .footer-link {
+            color: var(--footer-text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--text);
+        }
+
+        .footer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-info p {
+            margin: 0;
+        }
+
+        /* Jump to use cases button */
+        .jump-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
             color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+            transition: all 0.2s;
         }
-        
-        .api-key-card h3 {
-            color: white;
-            margin-bottom: 15px;
+
+        .jump-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
         }
-        
-        .api-key-card pre {
-            background: rgba(0,0,0,0.3);
+
+        /* JSON syntax highlighting */
+        .json-key {
+            color: #e2777a;
+        }
+
+        .json-string {
             color: #7ec699;
         }
-        
-        /* New styles for getting started section */
-        .getting-started-steps {
-            counter-reset: step-counter;
-            margin: 25px 0;
+
+        .json-number {
+            color: #f08d49;
         }
-        
+
+        .json-boolean {
+            color: #cc99cd;
+        }
+
+        /* Getting started steps */
+        .steps {
+            counter-reset: step-counter;
+            margin: 2rem 0;
+            width: 100%;
+        }
+
         .step {
             position: relative;
-            padding-left: 45px;
-            margin-bottom: 25px;
-            min-height: 40px;
+            padding-left: 3rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            box-sizing: border-box;
         }
-        
+
         .step::before {
             counter-increment: step-counter;
             content: counter(step-counter);
             position: absolute;
             left: 0;
             top: 0;
-            width: 32px;
-            height: 32px;
-            background: var(--primary);
+            width: 2rem;
+            height: 2rem;
+            background: var(--gradient);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -874,487 +899,653 @@
             justify-content: center;
             font-weight: bold;
         }
-        
-        .example-project {
-            background: rgba(88, 101, 242, 0.1);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .example-project h4 {
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-        }
-        
-        .example-project h4::before {
-            content: "🚀";
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-        
-        .tip {
-            background: var(--tip-bg);
-            border-left: 4px solid var(--tip-border);
-            padding: 15px;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            margin: 20px 0;
-        }
-        
-        .warning {
-            background: var(--warning-bg);
-            border-left: 4px solid var(--warning-border);
-            padding: 15px;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            margin: 20px 0;
-        }
-        
-        .important {
-            background: var(--important-bg);
-            border-left: 4px solid var(--important-border);
-            padding: 15px;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            margin: 20px 0;
-        }
-        
-        .note-box {
-            display: flex;
-            align-items: flex-start;
-            margin: 20px 0;
-        }
-        
-        .note-box::before {
-            content: "ℹ️";
-            font-size: 1.5rem;
-            margin-right: 12px;
-            margin-top: 3px;
-        }
-        
-        .step-icon {
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-        
-        /* New styles for uptime statistics */
-        .stats-container {
+
+        /* Use cases grid */
+        .use-cases-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            width: 100%;
         }
-        
-        .stat-value {
+
+        .use-case-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .use-case-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .use-case-icon {
             font-size: 1.5rem;
-            font-weight: bold;
+            margin-bottom: 1rem;
             color: var(--primary);
-            margin-top: 10px;
         }
-        
-        /* Code block wrapper for copy button */
-        .code-block-wrapper {
-            position: relative;
-            margin: 15px 0;
+
+        .use-case-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
-        
-        .copy-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
+
+        .use-case-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
         }
-        
-        .copy-button:hover {
-            background: var(--primary-light);
-            transform: translateY(-2px);
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-center {
+                display: none;
+            }
+
+            /* Fix footer for mobile */
+            .footer {
+                margin-left: 0;
+                width: 100%;
+            }
         }
-        
-        .copy-button:active {
-            transform: translateY(0);
+
+        @media (min-width: 1025px) {
+            /* Fix footer for desktop - prevent it from being behind sidebar */
+            .footer {
+                margin-left: var(--sidebar-width);
+                width: calc(100% - var(--sidebar-width));
+            }
         }
-        
+
         @media (max-width: 768px) {
-            body {
-                padding: 15px;
+            .header {
+                padding: 0 1rem;
             }
-            
-            header {
-                padding: 1.8rem;
+
+            .content {
+                padding: 1rem;
             }
-            
-            h1 {
-                font-size: 2rem;
+
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .api-header {
+
+            .footer-content {
                 flex-direction: column;
-                align-items: flex-start;
+                gap: 1.5rem;
+                text-align: center;
             }
-            
-            .theme-toggle {
-                top: 15px;
-                right: 15px;
-                width: 45px;
-                height: 45px;
-                font-size: 1.4rem;
+
+            .footer-links {
+                justify-content: center;
+                flex-wrap: wrap;
             }
-            
-            section {
-                padding: 20px;
+
+            .last-updated {
+                position: static;
+                margin-top: 1rem;
+                align-self: flex-start;
             }
-            
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .section-description {
+                font-size: 1rem;
+            }
+
+            .card, .endpoint-card {
+                padding: 1.25rem;
+            }
+
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .jump-button {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+            }
+
+            .code-block pre {
+                font-size: 0.85rem;
+            }
+
             .endpoint-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .endpoint-method {
-                margin-bottom: 10px;
+                margin-bottom: 0.5rem;
             }
-            
-            .contact-methods {
+
+            .table {
+                font-size: 0.9rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem;
+            }
+
+            .steps {
+                margin: 1.5rem 0;
+            }
+
+            .step {
+                padding-left: 2.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .step::before {
+                width: 1.75rem;
+                height: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 0.75rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .content {
+                padding: 0.75rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .section-header {
                 flex-direction: column;
+                align-items: flex-start;
             }
-            
-            .contact-item {
-                min-width: 100%;
+
+            .last-updated {
+                margin-top: 0.5rem;
+                align-self: flex-start;
             }
-            
-            .content-wrapper {
-                margin-left: 0 !important;
-                padding-left: 0 !important;
+
+            .card, .endpoint-card {
+                padding: 1rem;
             }
-            
-            .copy-button {
-                padding: 5px 8px;
-                font-size: 0.7rem;
+
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .endpoint-method {
+                margin-bottom: 0.5rem;
+            }
+
+            .table {
+                font-size: 0.9rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem;
+            }
+
+            .steps {
+                margin: 1.5rem 0;
+            }
+
+            .step {
+                padding-left: 2.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .step::before {
+                width: 1.75rem;
+                height: 1.75rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Improved mobile menu button -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar" id="sidebar">
-        <button class="close-menu" id="closeMenu">
-            <i class="fas fa-times"></i>
-        </button>
-        
-        <div class="sidebar-header">
-            <h2>API Navigation</h2>
-            <button class="collapse-btn" id="collapseBtn">
-                <i class="fas fa-chevron-left" id="collapseIcon"></i>
-                <span class="link-text">Collapse</span>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <img id="botAvatar" alt="Bot Avatar" class="logo-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                DonnySavage API
+            </a>
+        </div>
+        <div class="header-center">
+            <a href="#introduction" class="nav-link active">Introduction</a>
+            <a href="#getting-started" class="nav-link">Getting Started</a>
+            <a href="#endpoints" class="nav-link">Endpoints</a>
+            <a href="#implementation" class="nav-link">Implementation</a>
+            <a href="#use-cases" class="nav-link">Use Cases</a>
+            <a href="https://bot.api.donnysavagebot.publicvm.com/changelogs" class="nav-link">Changelog</a>
+        </div>
+        <div class="header-right">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
             </button>
         </div>
-        
-        <ul>
-            <li><a href="#getting-started"><i class="fas fa-play-circle"></i> <span class="link-text">Getting Started</span></a></li>
-            <li><a href="#introduction"><i class="fas fa-info-circle"></i> <span class="link-text">Introduction</span></a></li>
-            <li><a href="#endpoints"><i class="fas fa-plug"></i> <span class="link-text">API Endpoints</span></a></li>
-            <li><a href="#implementation"><i class="fas fa-code"></i> <span class="link-text">Implementation</span></a></li>
-            <li><a href="#usage"><i class="fas fa-book"></i> <span class="link-text">Usage Guidelines</span></a></li>
-            <li><a href="#use-cases"><i class="fas fa-lightbulb"></i> <span class="link-text">Use Cases</span></a></li>
-            <li><a href="#uptime-stats"><i class="fas fa-chart-line"></i> <span class="link-text">Uptime Stats</span></a></li>
-            <li><a href="#example-project"><i class="fas fa-project-diagram"></i> <span class="link-text">Example Project</span></a></li>
-            <li><a href="#support"><i class="fas fa-life-ring"></i> <span class="link-text">Support & Contact</span></a></li>
-        </ul>
-    </nav>
-    
-    <div class="content-wrapper">
-        <header>
-            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-                🌙
-            </button>
-            
-            <div class="api-header">
-                <div>
-                    <h1>DonnySavage Bot API Documentation</h1>
-                    <p>Programmatic access to bot functionality and server data</p>
-                </div>
-                <div class="last-updated">
-                    <span>Last updated: June 26, 2025</span>
+    </header>
+
+    <!-- Main container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <!-- Search box moved to sidebar -->
+            <div class="sidebar-search">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search documentation..." id="searchInput">
+                    <div class="search-results" id="searchResults"></div>
                 </div>
             </div>
-        </header>
-        
-        <section id="getting-started">
-            <h2>🚀 Getting Started</h2>
-            <p>Follow these steps to quickly integrate with the DonnySavage Bot API:</p>
-            
-            <div class="getting-started-steps">
-                <div class="step">
-                    <h3>Generate an API Key</h3>
-                    <p>In your Discord server, use the command: <code>/auth generate-key service="Your Service Name"</code></p>
-                    <div class="warning">
-                        <strong>Important:</strong> Store the key securely - it will only be shown once!
+
+            <!-- Get Started Section with expand/collapse -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-section="get-started">
+                    <span>Get Started</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="sidebar-links" id="get-started-links">
+                    <a href="#introduction" class="sidebar-link active">
+                        <i class="fas fa-info-circle"></i>
+                        Introduction
+                    </a>
+                    <a href="#getting-started" class="sidebar-link">
+                        <i class="fas fa-play-circle"></i>
+                        Getting Started
+                    </a>
+                </div>
+            </div>
+
+            <!-- API Reference Section with expand/collapse -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-section="api-reference">
+                    <span>API Reference</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="sidebar-links" id="api-reference-links">
+                    <a href="#endpoints" class="sidebar-link">
+                        <i class="fas fa-plug"></i>
+                        API Endpoints
+                    </a>
+                    <a href="#implementation" class="sidebar-link">
+                        <i class="fas fa-code"></i>
+                        Implementation
+                    </a>
+                    <a href="#usage" class="sidebar-link">
+                        <i class="fas fa-book"></i>
+                        Usage Guidelines
+                    </a>
+                </div>
+            </div>
+
+            <!-- Resources Section with expand/collapse -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" data-section="resources">
+                    <span>Resources</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="sidebar-links" id="resources-links">
+                    <a href="#use-cases" class="sidebar-link">
+                        <i class="fas fa-lightbulb"></i>
+                        Use Cases
+                    </a>
+                    <a href="#uptime-stats" class="sidebar-link">
+                        <i class="fas fa-chart-line"></i>
+                        Uptime Stats
+                    </a>
+                    <a href="#example-project" class="sidebar-link">
+                        <i class="fas fa-project-diagram"></i>
+                        Example Project
+                    </a>
+                    <a href="#support" class="sidebar-link">
+                        <i class="fas fa-life-ring"></i>
+                        Support & Contact
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="content">
+            <!-- Introduction Section -->
+            <section id="introduction" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Introduction</h1>
+                    <p class="section-description">The DonnySavage Bot API provides secure, programmatic access to bot functionality and server data</p>
+                    <div class="last-updated">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Last updated: June 26, 2025</span>
                     </div>
                 </div>
-                
-                <div class="step">
-                    <h3>Test Authentication</h3>
-                    <p>Verify your key works using this cURL command:</p>
-                    <pre><code>curl.exe -H "x-api-key: YOUR_API_KEY" ^
-http://bot.api.donnysavagebot.publicvm.com/api/secure-data</code></pre>
+
+                <div class="alert alert-tip">
+                    <strong>Tip:</strong> All API endpoints require authentication. Make sure to include your API key in the x-api-key header.
                 </div>
-                
-                <div class="step">
-                    <h3>Choose Your Integration</h3>
-                    <p>Select which endpoints you need:</p>
-                    <ul>
-                        <li>🔍 Member verification - <code>/api/verify-member</code></li>
-                        <li>📊 Bot statistics - <code>/api/bot-stats</code></li>
-                        <li>🔐 Secure data - <code>/api/secure-data</code></li>
-                    </ul>
-                </div>
-                
-                <div class="step">
-                    <h3>Implement in Your Application</h3>
-                    <p>Use the code examples below in your preferred language</p>
-                    <div class="tip">
-                        <strong>Tip:</strong> Start with the example project below if you need a reference implementation
-                    </div>
-                </div>
-            </div>
-            
-            <div class="example-project">
-                <h4>Starter Project Available In JavaScript</h4>
-                <p>Don't know where to start? Check out our prebuilt example project that demonstrates API integration:</p>
-                <p><a href="https://github.com/Abdo9616/DonnySavageAPIGuideProject.github.io/" target="_blank">
-                    View On GitHub
-                </a></p>
-                <p>This project includes:</p>
-                <ul>
-                    <li>Working implementation of member verification</li>
-                    <li>Bot stats dashboard</li>
-                    <li>API key management interface</li>
-                    <li>Error handling examples</li>
-                </ul>
-            </div>
-        </section>
-        
-        <section id="introduction">
-            <h2>📚 Introduction</h2>
-            <p>The DonnySavage Bot API provides secure, programmatic access to bot functionality and server data. This RESTful API allows developers to integrate bot features into their applications and services.</p>
-            
-            <div class="tip">
-                <strong>Tip:</strong> All API endpoints require authentication. Make sure to include your API key in the x-api-key header.
-            </div>
-            
-            <div class="section-container">
-                <div>
+
+                <div class="card">
                     <h3>API Base URL</h3>
-                    <pre><code>http://bot.api.donnysavagebot.publicvm.com</code></pre>
+                    <div class="code-block">
+                        <pre><code>http://bot.api.donnysavagebot.publicvm.com</code></pre>
+                    </div>
                 </div>
-                
-                <div>
+
+                <div class="card">
                     <h3>Authentication</h3>
                     <p>All endpoints require API key authentication:</p>
-                    <pre><code>x-api-key: YOUR_API_KEY</code></pre>
+                    <div class="code-block">
+                        <pre><code>x-api-key: YOUR_API_KEY</code></pre>
+                    </div>
                     <p>Keys are generated with <code>/auth generate-key</code></p>
                 </div>
-            </div>
-            
-            <div class="api-key-card">
-                <h3>🔑 Getting an API Key</h3>
-                <p>API keys are generated through the bot's commands:</p>
-                <pre><code>/auth generate-key service="My Web Service"</code></pre>
-                <p>Each key is tied to a specific Discord server and grants access to that server's resources.</p>
-                
-                <div class="important">
-                    <strong>Security Notice:</strong> API keys provide access to sensitive server data. Never expose them in client-side code!
+
+                <div class="card" style="background: linear-gradient(135deg, #2c2f33, #23272A); color: white; border: none;">
+                    <h3>🔑 Getting an API Key</h3>
+                    <p>API keys are generated through the bot's commands:</p>
+                    <div class="code-block" style="background: rgba(0,0,0,0.3);">
+                        <pre><code>/auth generate-key service="My Web Service"</code></pre>
+                    </div>
+                    <p>Each key is tied to a specific Discord server and grants access to that server's resources.</p>
+                    
+                    <div class="alert alert-important">
+                        <strong>Security Notice:</strong> API keys provide access to sensitive server data. Never expose them in client-side code!
+                    </div>
                 </div>
-            </div>
-        </section>
-        
-        <section id="endpoints">
-            <h2>🔌 API Endpoints</h2>
-            
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <div class="endpoint-method method-get">GET</div>
-                    <div class="endpoint-url">/api/secure-data</div>
+            </section>
+
+            <!-- Getting Started Section -->
+            <section id="getting-started" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Getting Started</h1>
+                    <p class="section-description">Learn how to integrate with the DonnySavage Bot API in just a few steps</p>
                 </div>
-                
-                <div class="endpoint-description">
-                    <p>Verifies API key authentication and returns basic service information.</p>
-                    <div class="tip">
-                        <strong>Use Case:</strong> First endpoint to call to verify your API key is working properly
+
+                <div class="steps">
+                    <div class="step">
+                        <h3>Generate an API Key</h3>
+                        <p>In your Discord server, use the command: <code>/auth generate-key service="Your Service Name"</code></p>
+                        <div class="alert alert-important">
+                            <strong>Important:</strong> Store the key securely - it will only be shown once!
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h3>Test Authentication</h3>
+                        <p>Verify your key works using this cURL command:</p>
+                        <div class="code-block">
+                            <pre><code>curl.exe -H "x-api-key: YOUR_API_KEY" ^
+http://bot.api.donnysavagebot.publicvm.com/api/secure-data</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h3>Choose Your Integration</h3>
+                        <p>Select which endpoints you need:</p>
+                        <ul>
+                            <li>🔍 Member verification - <code>/api/verify-member</code></li>
+                            <li>📊 Bot statistics - <code>/api/bot-stats</code></li>
+                            <li>🔐 Secure data - <code>/api/secure-data</code></li>
+                        </ul>
+                    </div>
+
+                    <div class="step">
+                        <h3>Implement in Your Application</h3>
+                        <p>Use the code examples below in your preferred language</p>
+                        <div class="alert alert-tip">
+                            <strong>Tip:</strong> Start with the example project below if you need a reference implementation
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Improved Example Project Card -->
+                <div class="example-project">
+                    <h4>Starter Project Available</h4>
+                    <p>Don't know where to start? Check out our prebuilt example project that demonstrates API integration:</p>
+                    <p><a href="https://github.com/Abdo9616/DonnySavageAPIGuideProject.github.io/" target="_blank">
+                        View On GitHub
+                    </a></p>
+                    <p>This project includes:</p>
+                    <ul>
+                        <li>Working implementation of member verification</li>
+                        <li>Bot stats dashboard</li>
+                        <li>API key management interface</li>
+                        <li>Error handling examples</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- API Endpoints Section -->
+            <section id="endpoints" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">API Endpoints</h1>
+                    <p class="section-description">Explore all available endpoints and their functionality</p>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <div class="endpoint-method method-get">GET</div>
+                        <div class="endpoint-url">/api/secure-data</div>
                     </div>
                     
-                    <div class="warning">
-                        <strong>Rate Limit:</strong> 30 requests per 10 minutes per IP
+                    <div class="endpoint-description">
+                        <p>Verifies API key authentication and returns basic service information.</p>
+                        <div class="alert alert-tip">
+                            <strong>Use Case:</strong> First endpoint to call to verify your API key is working properly
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Rate Limit:</strong> 30 requests per 10 minutes per IP
+                        </div>
                     </div>
-                </div>
-                
-                <div class="endpoint-response">
-                    <div class="response-title">Response</div>
-                    <div class="json-block">
-                        <pre><code>{
+                    
+                    <div class="endpoint-response">
+                        <div class="response-title">Response</div>
+                        <div class="code-block">
+                            <pre><code>{
   <span class="json-key">"status"</span>: <span class="json-string">"success"</span>,
   <span class="json-key">"message"</span>: <span class="json-string">"Access granted to protected resource"</span>,
   <span class="json-key">"service"</span>: <span class="json-string">"Your Service Name"</span>,
   <span class="json-key">"guildId"</span>: <span class="json-string">"123456789012345678"</span>
 }</code></pre>
+                        </div>
+                        
+                        <h4>Response Fields</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>status</td>
+                                    <td>string</td>
+                                    <td>Operation status ("success")</td>
+                                </tr>
+                                <tr>
+                                    <td>message</td>
+                                    <td>string</td>
+                                    <td>Confirmation message</td>
+                                </tr>
+                                <tr>
+                                    <td>service</td>
+                                    <td>string</td>
+                                    <td>Name of the service associated with the API key</td>
+                                </tr>
+                                <tr>
+                                    <td>guildId</td>
+                                    <td>string</td>
+                                    <td>Discord server ID associated with the API key</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <div class="endpoint-method method-get">GET</div>
+                        <div class="endpoint-url">/api/bot-stats</div>
                     </div>
                     
-                    <h4>Response Fields</h4>
-                    <table class="endpoint-table">
-                        <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>status</td>
-                                <td>string</td>
-                                <td>Operation status ("success")</td>
-                            </tr>
-                            <tr>
-                                <td>message</td>
-                                <td>string</td>
-                                <td>Confirmation message</td>
-                            </tr>
-                            <tr>
-                                <td>service</td>
-                                <td>string</td>
-                                <td>Name of the service associated with the API key</td>
-                            </tr>
-                            <tr>
-                                <td>guildId</td>
-                                <td>string</td>
-                                <td>Discord server ID associated with the API key</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <div class="endpoint-method method-get">GET</div>
-                    <div class="endpoint-url">/api/bot-stats</div>
-                </div>
-                
-                <div class="endpoint-description">
-                    <p>Returns real-time statistics about the bot's presence and performance.</p>
-                    <div class="tip">
-                        <strong>Use Case:</strong> Monitor bot health and performance on your dashboard
+                    <div class="endpoint-description">
+                        <p>Returns real-time statistics about the bot's presence and performance.</p>
+                        <div class="alert alert-tip">
+                            <strong>Use Case:</strong> Monitor bot health and performance on your dashboard
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Rate Limit:</strong> 30 requests per 10 minutes per IP
+                        </div>
                     </div>
                     
-                    <div class="warning">
-                        <strong>Rate Limit:</strong> 30 requests per 10 minutes per IP
-                    </div>
-                </div>
-                
-                <div class="endpoint-response">
-                    <div class="response-title">Response</div>
-                    <div class="json-block">
-                        <pre><code>{
+                    <div class="endpoint-response">
+                        <div class="response-title">Response</div>
+                        <div class="code-block">
+                            <pre><code>{
   <span class="json-key">"guilds"</span>: <span class="json-number">127</span>,
   <span class="json-key">"users"</span>: <span class="json-number">38426</span>,
   <span class="json-key">"uptime"</span>: <span class="json-number">12345.67</span>
 }</code></pre>
+                        </div>
+                        
+                        <h4>Response Fields</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>guilds</td>
+                                    <td>integer</td>
+                                    <td>Number of servers where bot is active</td>
+                                </tr>
+                                <tr>
+                                    <td>users</td>
+                                    <td>integer</td>
+                                    <td>Total unique users across servers</td>
+                                </tr>
+                                <tr>
+                                    <td>uptime</td>
+                                    <td>float</td>
+                                    <td>Bot uptime in seconds</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    
-                    <h4>Response Fields</h4>
-                    <table class="endpoint-table">
-                        <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>guilds</td>
-                                <td>integer</td>
-                                <td>Number of servers where bot is active</td>
-                            </tr>
-                            <tr>
-                                <td>users</td>
-                                <td>integer</td>
-                                <td>Total unique users across servers</td>
-                            </tr>
-                            <tr>
-                                <td>uptime</td>
-                                <td>float</td>
-                                <td>Bot uptime in seconds</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
-            </div>
-            
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <div class="endpoint-method method-post">POST</div>
-                    <div class="endpoint-method method-get">GET</div>
-                    <div class="endpoint-url">/api/verify-member</div>
-                </div>
-                
-                <div class="endpoint-description">
-                    <p>Checks if a user belongs to your server, returns member information, or gets server member count.</p>
-                    <div class="tip">
-                        <strong>Use Case:</strong> Authenticate users for role-based access or restrict services to Discord members. For instance, allow access only to users who log in with their Discord account and belong to your server, ensuring secure and exclusive content delivery.
-                    </div>
-                    <div class="tip">
-                        <strong>New Use Case:</strong> Display server member count on your website or dashboard to show community size
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <div class="endpoint-method method-post">POST</div>
+                        <div class="endpoint-method method-get">GET</div>
+                        <div class="endpoint-url">/api/verify-member</div>
                     </div>
                     
-                    <div class="warning">
-                        <strong>Rate Limit:</strong> 30 requests per 10 minutes per IP
-                    </div>
-                    
-                    <h4>Request Parameters (GET)</h4>
-                    <table class="endpoint-table">
-                        <thead>
-                            <tr>
-                                <th>Parameter</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>userId</td>
-                                <td>string</td>
-                                <td>Discord user ID or "count" to get server member count</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <h4>Request Body (POST)</h4>
-                    <div class="json-block">
-                        <pre><code>{
+                    <div class="endpoint-description">
+                        <p>Checks if a user belongs to your server, returns member information, or gets server member count.</p>
+                        <div class="alert alert-tip">
+                            <strong>Use Case:</strong> Authenticate users for role-based access or restrict services to Discord members. For instance, allow access only to users who log in with their Discord account and belong to your server, ensuring secure and exclusive content delivery.
+                            <a href="#use-cases" class="jump-button">
+                                <i class="fas fa-arrow-right"></i> See Use Cases
+                            </a>
+                        </div>
+                        <div class="alert alert-tip">
+                            <strong>New Use Case:</strong> Display server member count on your website or dashboard to show community size
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Rate Limit:</strong> 30 requests per 10 minutes per IP
+                        </div>
+                        
+                        <h4>Request Parameters (GET)</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>userId</td>
+                                    <td>string</td>
+                                    <td>Discord user ID or "count" to get server member count</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4>Request Body (POST)</h4>
+                        <div class="code-block">
+                            <pre><code>{
   <span class="json-key">"userId"</span>: <span class="json-string">"987654321098765432"</span> <span class="json-comment">// or "count" for member count</span>
 }</code></pre>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="endpoint-response">
-                    <div class="response-title">Response (Member Verification)</div>
-                    <div class="json-block">
-                        <pre><code>{
+                    
+                    <div class="endpoint-response">
+                        <div class="response-title">Response (Member Verification)</div>
+                        <div class="code-block">
+                            <pre><code>{
   <span class="json-key">"id"</span>: <span class="json-string">"987654321098765432"</span>,
   <span class="json-key">"username"</span>: <span class="json-string">"DiscordUser"</span>,
   <span class="json-key">"discriminator"</span>: <span class="json-string">"1234"</span>,
@@ -1371,119 +1562,122 @@ http://bot.api.donnysavagebot.publicvm.com/api/secure-data</code></pre>
   ],
   <span class="json-key">"joinedAt"</span>: <span class="json-string">"2023-01-15T10:30:00.000Z"</span>
 }</code></pre>
-                    </div>
-                    
-                    <h4>Response Fields (Verification)</h4>
-                    <table class="endpoint-table">
-                        <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>id</td>
-                                <td>string</td>
-                                <td>Discord user ID</td>
-                            </tr>
-                            <tr>
-                                <td>username</td>
-                                <td>string</td>
-                                <td>Discord username</td>
-                            </tr>
-                            <tr>
-                                <td>discriminator</td>
-                                <td>string</td>
-                                <td>User's 4-digit discriminator</td>
-                            </tr>
-                            <tr>
-                                <td>avatar</td>
-                                <td>string</td>
-                                <td>URL to user's avatar image</td>
-                            </tr>
-                            <tr>
-                                <td>roles</td>
-                                <td>array</td>
-                                <td>Array of role objects (id and name)</td>
-                            </tr>
-                            <tr>
-                                <td>joinedAt</td>
-                                <td>string</td>
-                                <td>ISO 8601 timestamp of when user joined the server</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <div class="response-title">Response (Member Count)</div>
-                    <div class="json-block">
-                        <pre><code>{
+                        </div>
+                        
+                        <h4>Response Fields (Verification)</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>string</td>
+                                    <td>Discord user ID</td>
+                                </tr>
+                                <tr>
+                                    <td>username</td>
+                                    <td>string</td>
+                                    <td>Discord username</td>
+                                </tr>
+                                <tr>
+                                    <td>discriminator</td>
+                                    <td>string</td>
+                                    <td>User's 4-digit discriminator</td>
+                                </tr>
+                                <tr>
+                                    <td>avatar</td>
+                                    <td>string</td>
+                                    <td>URL to user's avatar image</td>
+                                </tr>
+                                <tr>
+                                    <td>roles</td>
+                                    <td>array</td>
+                                    <td>Array of role objects (id and name)</td>
+                                </tr>
+                                <tr>
+                                    <td>joinedAt</td>
+                                    <td>string</td>
+                                    <td>ISO 8601 timestamp of when user joined the server</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="response-title">Response (Member Count)</div>
+                        <div class="code-block">
+                            <pre><code>{
   <span class="json-key">"status"</span>: <span class="json-string">"success"</span>,
   <span class="json-key">"guildId"</span>: <span class="json-string">"123456789012345678"</span>,
   <span class="json-key">"guildName"</span>: <span class="json-string">"My Awesome Server"</span>,
   <span class="json-key">"memberCount"</span>: <span class="json-number">250</span>
 }</code></pre>
+                        </div>
+                        
+                        <h4>Response Fields (Count)</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>status</td>
+                                    <td>string</td>
+                                    <td>Operation status ("success")</td>
+                                </tr>
+                                <tr>
+                                    <td>guildId</td>
+                                    <td>string</td>
+                                    <td>Discord server ID associated with the API key</td>
+                                </tr>
+                                <tr>
+                                    <td>guildName</td>
+                                    <td>string</td>
+                                    <td>Name of the Discord server</td>
+                                </tr>
+                                <tr>
+                                    <td>memberCount</td>
+                                    <td>integer</td>
+                                    <td>Total number of members in the server</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4>Response (Errors)</h4>
+                        <ul>
+                            <li><code>400 Bad Request</code>: Invalid/missing userId in request body</li>
+                            <li><code>401 Unauthorized</code>: Missing or invalid API key</li>
+                            <li><code>404 Not Found</code>: Guild or user not found</li>
+                            <li><code>429 Too Many Requests</code>: Rate limit exceeded</li>
+                        </ul>
                     </div>
-                    
-                    <h4>Response Fields (Count)</h4>
-                    <table class="endpoint-table">
-                        <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>status</td>
-                                <td>string</td>
-                                <td>Operation status ("success")</td>
-                            </tr>
-                            <tr>
-                                <td>guildId</td>
-                                <td>string</td>
-                                <td>Discord server ID associated with the API key</td>
-                            </tr>
-                            <tr>
-                                <td>guildName</td>
-                                <td>string</td>
-                                <td>Name of the Discord server</td>
-                            </tr>
-                            <tr>
-                                <td>memberCount</td>
-                                <td>integer</td>
-                                <td>Total number of members in the server</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <h4>Response (Errors)</h4>
-                    <ul>
-                        <li><code>400 Bad Request</code>: Invalid/missing userId in request body</li>
-                        <li><code>401 Unauthorized</code>: Missing or invalid API key</li>
-                        <li><code>404 Not Found</code>: Guild or user not found</li>
-                        <li><code>429 Too Many Requests</code>: Rate limit exceeded</li>
-                    </ul>
                 </div>
-            </div>
-        </section>
-        
-        <section id="implementation">
-            <h2>💻 Implementation Examples</h2>
-            
-            <div class="tabs">
-                <div class="tab active" data-tab="javascript">JavaScript</div>
-                <div class="tab" data-tab="python">Python</div>
-                <div class="tab" data-tab="curl">cURL</div>
-            </div>
-            
-            <div id="javascript" class="tab-content active">
-                <h3>JavaScript (Node.js)</h3>
-                <div class="code-block-wrapper">
-                    <pre><code>// Member Verification Example
+            </section>
 
+            <!-- Implementation Section -->
+            <section id="implementation" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Implementation Examples</h1>
+                    <p class="section-description">Code samples in various programming languages</p>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="javascript">JavaScript</div>
+                    <div class="tab" data-tab="python">Python</div>
+                    <div class="tab" data-tab="curl">cURL</div>
+                </div>
+                
+                <div id="javascript" class="tab-content active">
+                    <h3>JavaScript (Node.js)</h3>
+                    <div class="code-block">
+                        <pre><code>// Member Verification Example
 const API_KEY = 'YOUR_API_KEY';
 
 const verifyMember = async (userId, getCount = false) => {
@@ -1558,16 +1752,16 @@ const getBotStats = async () => {
 getBotStats().then(stats => {
   console.log(`Bot Stats: ${stats.guilds} servers, ${stats.users} users`);
 });</code></pre>
+                    </div>
                     <button class="copy-button">
                         <i class="fas fa-copy"></i> Copy
                     </button>
                 </div>
-            </div>
-            
-            <div id="python" class="tab-content">
-                <h3>Python</h3>
-                <div class="code-block-wrapper">
-                    <pre><code>import requests
+                
+                <div id="python" class="tab-content">
+                    <h3>Python</h3>
+                    <div class="code-block">
+                        <pre><code>import requests
 import json
 
 # Replace with your actual API key
@@ -1662,16 +1856,16 @@ if __name__ == '__main__':
         print(f'Bot Stats: {stats["guilds"]} servers, {stats["users"]} users')
     except Exception:
         print('Failed to get bot stats')</code></pre>
+                    </div>
                     <button class="copy-button">
                         <i class="fas fa-copy"></i> Copy
                     </button>
                 </div>
-            </div>
-            
-            <div id="curl" class="tab-content">
-                <h3>cURL</h3>
-                <div class="code-block-wrapper">
-                    <pre><code># Verify API key
+                
+                <div id="curl" class="tab-content">
+                    <h3>cURL</h3>
+                    <div class="code-block">
+                        <pre><code># Verify API key
 curl.exe -H "x-api-key: YOUR_API_KEY" ^
   http://bot.api.donnysavagebot.publicvm.com/api/secure-data
 
@@ -1690,29 +1884,32 @@ curl.exe -X POST "http://bot.api.donnysavagebot.publicvm.com/api/verify-member" 
   -H "x-api-key: YOUR_API_KEY" ^
   -H "Content-Type: application/json" ^
   -d "{\"userId\": \"count\"}"</code></pre>
+                    </div>
                     <button class="copy-button">
                         <i class="fas fa-copy"></i> Copy
                     </button>
                 </div>
-            </div>
-        </section>
-        
-        <section id="usage">
-            <h2>📝 Usage Guidelines</h2>
-            
-            <div class="section-container">
-                <div>
+            </section>
+
+            <!-- Usage Guidelines Section -->
+            <section id="usage" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Usage Guidelines</h1>
+                    <p class="section-description">Best practices and limitations for using the API</p>
+                </div>
+                
+                <div class="card">
                     <h3>Rate Limiting</h3>
                     <p>Max <span class="highlight">30 requests</span> per <span class="highlight">10 minutes</span> per IP</p>
-                    <div class="note-box">
+                    <div class="alert alert-tip">
                         <strong>Note:</strong> This rate limit applies to all protected API endpoints
                     </div>
-                    <div class="tip">
+                    <div class="alert alert-tip">
                         <strong>Tip:</strong> Implement caching for frequently accessed data to stay within limits
                     </div>
                 </div>
                 
-                <div>
+                <div class="card">
                     <h3>Error Handling</h3>
                     <ul>
                         <li><code>401 Unauthorized</code>: Invalid/missing API key</li>
@@ -1722,135 +1919,388 @@ curl.exe -X POST "http://bot.api.donnysavagebot.publicvm.com/api/verify-member" 
                         <li><code>500 Internal Server Error</code>: Bot/server issues</li>
                     </ul>
                 </div>
-            </div>
-            
-            <h3>Security Recommendations</h3>
-            <ul>
-                <li>Always use HTTPS in production environments</li>
-                <li>Never expose API keys in client-side code</li>
-                <li>Rotate API keys periodically using <code>/auth generate-key</code></li>
-                <li>Store API keys securely using environment variables or secret managers</li>
-                <li>Revoke compromised keys immediately with <code>/auth revoke-key</code></li>
-                <li>Restrict key permissions to only necessary endpoints</li>
-            </ul>
-            
-            <div class="warning">
-                <strong>Warning:</strong> The verify-member endpoint can be rate limited. Implement caching for repeated requests for the same user.
-            </div>
-        </section>
-        
-        <section id="use-cases">
-            <h2>💡 Practical Use Cases</h2>
-            
-            <div class="use-case-grid">
-                <div class="use-case-card">
-                    <h4>Web Dashboard Integration</h4>
-                    <p>Integrate real-time server statistics into your community dashboard using the bot-stats endpoint. This can also serve as a health check to monitor the bot's performance and uptime.</p>
+                
+                <div class="card">
+                    <h3>Security Recommendations</h3>
+                    <ul>
+                        <li>Always use HTTPS in production environments</li>
+                        <li>Never expose API keys in client-side code</li>
+                        <li>Rotate API keys periodically using <code>/auth generate-key</code></li>
+                        <li>Store API keys securely using environment variables or secret managers</li>
+                        <li>Revoke compromised keys immediately with <code>/auth revoke-key</code></li>
+                        <li>Restrict key permissions to only necessary endpoints</li>
+                    </ul>
                 </div>
                 
-                <div class="use-case-card">
-                    <h4>Role Gating</h4>
-                    <p>Restrict website access to server members using the verify-member endpoint.</p>
+                <div class="alert alert-warning">
+                    <strong>Warning:</strong> The verify-member endpoint can be rate limited. Implement caching for repeated requests for the same user.
                 </div>
-                
-                <div class="use-case-card">
-                    <h4>Custom Mod Tools</h4>
-                    <p>Build external moderation interfaces that integrate with your Discord server.</p>
-                </div>
-                
-                <div class="use-case-card">
-                    <h4>Server Analytics</h4>
-                    <p>Track member growth and engagement over time using the bot API.</p>
-                </div>
-                
-                <div class="use-case-card">
-                    <h4>User Verification</h4>
-                    <p>Verify Discord membership for exclusive content access on your platform.</p>
-                </div>
-                
-                <div class="use-case-card">
-                    <h4>Premium Content Access</h4>
-                    <p>Grant access to premium features based on Discord roles.</p>
-                </div>
-                <div class="use-case-card">
-                    <h4>Show Your Community Size</h4>
-                    <p>Display server member count on your website or dashboard.</p>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="uptime-stats">
-            <h2>⏱️ Uptime Statistics</h2>
-            <div class="stats-container">
-                <div class="use-case-card">
-                    <h4>Current Uptime</h4>
-                    <div class="stat-value" id="current-uptime">Loading...</div>
+            <!-- Use Cases Section -->
+            <section id="use-cases" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Use Cases</h1>
+                    <p class="section-description">Practical applications for the DonnySavage Bot API</p>
                 </div>
-                <div class="use-case-card">
-                    <h4 id="current-month-label">Current Month</h4>
-                    <div class="stat-value" id="current-month">Loading...</div>
+                
+                <div class="use-cases-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="use-case-title">Web Dashboard Integration</div>
+                        <div class="use-case-description">
+                            Integrate real-time server statistics into your community dashboard using the bot-stats endpoint. This can also serve as a health check to monitor the bot's performance and uptime.
+                        </div>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="use-case-title">Role Gating</div>
+                        <div class="use-case-description">
+                            Restrict website access to server members using the verify-member endpoint.
+                        </div>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="use-case-title">Custom Mod Tools</div>
+                        <div class="use-case-description">
+                            Build external moderation interfaces that integrate with your Discord server.
+                        </div>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="use-case-title">Server Analytics</div>
+                        <div class="use-case-description">
+                            Track member growth and engagement over time using the bot API.
+                        </div>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="use-case-title">User Verification</div>
+                        <div class="use-case-description">
+                            Verify Discord membership for exclusive content access on your platform.
+                        </div>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="use-case-title">Premium Content Access</div>
+                        <div class="use-case-description">
+                            Grant access to premium features based on Discord roles.
+                        </div>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="use-case-title">Show Your Community Size</div>
+                        <div class="use-case-description">
+                            Display server member count on your website or dashboard.
+                        </div>
+                    </div>
                 </div>
-                <div class="use-case-card">
-                    <h4 id="previous-month-label">Previous Month</h4>
-                    <div class="stat-value" id="previous-month">Loading...</div>
+            </section>
+
+            <!-- Uptime Stats Section -->
+            <section id="uptime-stats" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Uptime Statistics</h1>
+                    <p class="section-description">Real-time performance and availability metrics</p>
                 </div>
-            </div>
-            <div id="uptime-error" class="warning" style="display: none;">
-                <strong>Notice:</strong> Unable to fetch uptime statistics at this time. Please try again later.
-            </div>
-        </section>
-        
-        <section id="example-project">
-            <h2>🌟 Example Project</h2>
-            <p>For a complete implementation example, check out our starter project:</p>
-            
-            <div class="use-case-card">
-                <h4>DonnySavage API Guide Project</h4>
-                <p>A ready-to-use implementation demonstrating:</p>
-                <ul>
-                    <li>API key management interface</li>
-                    <li>Member verification flow</li>
-                    <li>Server stats dashboard</li>
-                    <li>Error handling best practices</li>
-                </ul>
-                <p><a href="https://github.com/Abdo9616/DonnySavageAPIGuideProject.github.io/" target="_blank">
-                    View on GitHub
-                </a></p>
-            </div>
-            
-            <div class="tip">
-                <strong>Tip:</strong> This project is an excellent starting point if you're new to API integration. 
-                It demonstrates all key features in a working application.
-            </div>
-        </section>
-        
-        <section id="support">
-            <h2>🛠️ Support & Contact</h2>
-            <p>For API support, feature requests, or issues:</p>
-            
-            <div class="contact-methods">
-                <div class="contact-item">
-                    <strong>In-app Command</strong>
-                    <p>Use <code>/report</code> command</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-uptime">Loading...</div>
+                        <div class="stat-label">Current Uptime</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-month">Loading...</div>
+                        <div class="stat-label" id="current-month-label">Current Month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="previous-month">Loading...</div>
+                        <div class="stat-label" id="previous-month-label">Previous Month</div>
+                    </div>
                 </div>
-                <div class="contact-item">
-                    <strong>Discord Support</strong>
-                    <p><a href="https://discord.gg/kRkkpWTCn7">Support Server</a></p>
+                
+                <div id="uptime-error" class="alert alert-warning" style="display: none;">
+                    <strong>Notice:</strong> Unable to fetch uptime statistics at this time. Please try again later.
                 </div>
-                <div class="contact-item">
-                    <strong>Email</strong>
-                    <p><a href="mailto:donnysavagehelp@gmail.com" style="color: #6c75f5;">donnysavagehelp@gmail.com</a></p>
+            </section>
+
+            <!-- Example Project Section -->
+            <section id="example-project" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Example Project</h1>
+                    <p class="section-description">A complete implementation to help you get started</p>
                 </div>
-            </div>
-        </section>
-        
-        <footer>
-            <p>© 2025 DonnySavage Bot | API Version 1.2</p>
-            <p>This documentation is a guide for developers only</p>
-        </footer>
+                
+                <div class="example-project">
+                    <h4>DonnySavage API Guide Project</h4>
+                    <p>A ready-to-use implementation demonstrating:</p>
+                    <ul>
+                        <li>API key management interface</li>
+                        <li>Member verification flow</li>
+                        <li>Server stats dashboard</li>
+                        <li>Error handling best practices</li>
+                    </ul>
+                    <p><a href="https://github.com/Abdo9616/DonnySavageAPIGuideProject.github.io/" target="_blank">
+                        View on GitHub
+                    </a></p>
+                </div>
+                
+                <div class="alert alert-tip">
+                    <strong>Tip:</strong> This project is an excellent starting point if you're new to API integration. 
+                    It demonstrates all key features in a working application.
+                </div>
+            </section>
+
+            <!-- Support Section -->
+            <section id="support" class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Support & Contact</h1>
+                    <p class="section-description">Get help with API integration and report issues</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Need Help?</h3>
+                    <p>For API support, feature requests, or issues:</p>
+                    
+                    <div class="use-cases-grid">
+                        <div class="use-case-card">
+                            <div class="use-case-icon">
+                                <i class="fas fa-comment-alt"></i>
+                            </div>
+                            <div class="use-case-title">In-app Command</div>
+                            <div class="use-case-description">
+                                Use <code>/report</code> command directly in Discord
+                            </div>
+                        </div>
+                        
+                        <div class="use-case-card">
+                            <div class="use-case-icon">
+                                <i class="fab fa-discord"></i>
+                            </div>
+                            <div class="use-case-title">Discord Support</div>
+                            <div class="use-case-description">
+                                <a href="https://discord.gg/kRkkpWTCn7" style="color: var(--primary);">Join our Support Server</a>
+                            </div>
+                        </div>
+                        
+                        <div class="use-case-card">
+                            <div class="use-case-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="use-case-title">Email</div>
+                            <div class="use-case-description">
+                                <a href="mailto:donnysavagehelp@gmail.com" style="color: var(--primary);">donnysavagehelp@gmail.com</a>
+                            </div>
+                        </div>
+
+                        <div class="use-case-card">
+                            <div class="use-case-icon">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                            <div class="use-case-title">Web Report</div>
+                            <div class="use-case-description">
+                                <a href="https://bot.api.donnysavagebot.publicvm.com/report" style="color: var(--primary);">Submit a Bug Report</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-    
+
+    <!-- Footer - Fixed -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <p>© 2025 DonnySavage Bot | API Version 1.2</p>
+                <p style="color: var(--footer-text); font-size: 0.9rem;">This documentation is a guide for developers only</p>
+            </div>
+            <div class="footer-links">
+                <a href="https://bot.api.donnysavagebot.publicvm.com/changelogs" class="footer-link">Changelog</a>
+                <a href="https://abdo9616.github.io/DonnySavage-bot-Policy.github.io/" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
+        // Theme toggle functionality
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        // Set initial icon based on theme
+        const initialIcon = currentTheme === 'light' ? 'fa-sun' : 'fa-moon';
+        document.getElementById('themeToggle').innerHTML = `<i class="fas ${initialIcon}"></i>`;
+        
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update button icon
+            const icon = newTheme === 'light' ? 'fa-sun' : 'fa-moon';
+            document.getElementById('themeToggle').innerHTML = `<i class="fas ${icon}"></i>`;
+        });
+        
+        // Mobile menu functionality
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+        
+        // Close menu when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('open') && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target) &&
+                window.innerWidth <= 1024) {
+                sidebar.classList.remove('open');
+            }
+        });
+        
+        // Sidebar expand/collapse functionality
+        document.querySelectorAll('.sidebar-section-title').forEach(title => {
+            title.addEventListener('click', (e) => {
+                // Don't trigger if clicking on a link inside the title
+                if (e.target.tagName === 'A') return;
+                
+                const section = title.getAttribute('data-section');
+                const links = document.getElementById(`${section}-links`);
+                const icon = title.querySelector('.toggle-icon');
+                
+                // Toggle collapsed state
+                title.classList.toggle('collapsed');
+                links.classList.toggle('collapsed');
+                
+                // Update icon rotation
+                if (title.classList.contains('collapsed')) {
+                    icon.style.transform = 'rotate(-90deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show target tab content
+                const targetId = tab.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    // Close mobile menu after navigation
+                    if (window.innerWidth <= 1024) {
+                        sidebar.classList.remove('open');
+                    }
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Update active nav link based on scroll position
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // Copy button functionality for code examples
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const codeElement = button.parentElement.querySelector('code');
+                const codeText = codeElement.textContent || codeElement.innerText;
+                
+                navigator.clipboard.writeText(codeText).then(() => {
+                    // Show success feedback
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    button.style.backgroundColor = '#10b981';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.backgroundColor = '';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            });
+        });
+
         // Format uptime for display
         function formatUptime(seconds) {
             const days = Math.floor(seconds / 86400);
@@ -1874,7 +2324,7 @@ curl.exe -X POST "http://bot.api.donnysavagebot.publicvm.com/api/verify-member" 
             
             const fetchWithRetry = async () => {
                 try {
-                    const response = await fetch('https://bot.api.donnysavagebot.publicvm.com/api/uptime-stats');
+                    const response = await fetch('https://341435.site.bot-hosting.net/api/uptime-stats');
                     
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -1952,13 +2402,261 @@ curl.exe -X POST "http://bot.api.donnysavagebot.publicvm.com/api/verify-member" 
             }
         }
         
-        // Load stats when page is ready
+        // Load bot avatar
+        async function loadBotAvatar() {
+            try {
+                const response = await fetch('https://341435.site.bot-hosting.net/api/bot-avatar');
+                if (!response.ok) throw new Error('Failed to fetch bot avatar');
+                const data = await response.json();
+                
+                const botAvatar = document.getElementById('botAvatar');
+                botAvatar.src = data.avatarURL;
+                botAvatar.alt = 'Bot Avatar';
+            } catch (error) {
+                console.error('Error loading bot avatar:', error);
+                // Show default icon if avatar fails to load
+                const logoIcon = document.querySelector('.logo-icon');
+                logoIcon.innerHTML = '<i class="fas fa-robot"></i>';
+                logoIcon.style.background = 'var(--gradient)';
+            }
+        }
+        
+        // Enhanced search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            
+            // Index all content sections for search
+            const contentSections = document.querySelectorAll('.section');
+            const searchIndex = [];
+            
+            // Build search index
+            contentSections.forEach(section => {
+                const sectionId = section.id;
+                const sectionTitle = section.querySelector('.section-title')?.textContent || '';
+                const sectionDescription = section.querySelector('.section-description')?.textContent || '';
+                
+                // Get all text content from the section
+                const sectionContent = section.textContent || '';
+                
+                // Get cards and their content
+                const cards = section.querySelectorAll('.card, .endpoint-card, .example-project');
+                const cardContents = [];
+                
+                cards.forEach(card => {
+                    const cardTitle = card.querySelector('h3, .card-title')?.textContent || '';
+                    const cardContent = card.textContent || '';
+                    cardContents.push({
+                        title: cardTitle,
+                        content: cardContent
+                    });
+                });
+                
+                // Add to search index
+                searchIndex.push({
+                    id: sectionId,
+                    title: sectionTitle,
+                    description: sectionDescription,
+                    content: sectionContent,
+                    cards: cardContents,
+                    path: getSectionPath(sectionId)
+                });
+            });
+            
+            // Search function
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.trim().toLowerCase();
+                
+                if (searchTerm.length < 2) {
+                    searchResults.classList.remove('active');
+                    return;
+                }
+                
+                const results = performSearch(searchTerm);
+                displayResults(results, searchTerm);
+            });
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+            
+            // Perform search across all indexed content
+            function performSearch(searchTerm) {
+                const results = [];
+                
+                searchIndex.forEach(section => {
+                    let relevance = 0;
+                    let matches = [];
+                    
+                    // Check title match (highest relevance)
+                    if (section.title.toLowerCase().includes(searchTerm)) {
+                        relevance += 10;
+                        matches.push({
+                            type: 'title',
+                            text: section.title,
+                            index: section.title.toLowerCase().indexOf(searchTerm)
+                        });
+                    }
+                    
+                    // Check description match
+                    if (section.description.toLowerCase().includes(searchTerm)) {
+                        relevance += 5;
+                        matches.push({
+                            type: 'description',
+                            text: section.description,
+                            index: section.description.toLowerCase().indexOf(searchTerm)
+                        });
+                    }
+                    
+                    // Check card titles
+                    section.cards.forEach(card => {
+                        if (card.title.toLowerCase().includes(searchTerm)) {
+                            relevance += 3;
+                            matches.push({
+                                type: 'card-title',
+                                text: card.title,
+                                index: card.title.toLowerCase().indexOf(searchTerm)
+                            });
+                        }
+                    });
+                    
+                    // Check content match
+                    if (section.content.toLowerCase().includes(searchTerm)) {
+                        relevance += 1;
+                        matches.push({
+                            type: 'content',
+                            text: section.content,
+                            index: section.content.toLowerCase().indexOf(searchTerm)
+                        });
+                    }
+                    
+                    // If we have matches, add to results
+                    if (relevance > 0) {
+                        results.push({
+                            section: section,
+                            relevance: relevance,
+                            matches: matches
+                        });
+                    }
+                });
+                
+                // Sort by relevance
+                return results.sort((a, b) => b.relevance - a.relevance);
+            }
+            
+            // Display search results
+            function displayResults(results, searchTerm) {
+                searchResults.innerHTML = '';
+                
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<div class="no-results">No results found for "' + searchTerm + '"</div>';
+                    searchResults.classList.add('active');
+                    return;
+                }
+                
+                // Show up to 10 results
+                const displayResults = results.slice(0, 10);
+                
+                displayResults.forEach(result => {
+                    const section = result.section;
+                    const bestMatch = result.matches[0]; // Use the highest relevance match
+                    
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.addEventListener('click', function() {
+                        // Navigate to section
+                        const targetElement = document.getElementById(section.id);
+                        if (targetElement) {
+                            // Close mobile menu after navigation
+                            if (window.innerWidth <= 1024) {
+                                sidebar.classList.remove('open');
+                            }
+                            
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                            
+                            // Close search results
+                            searchResults.classList.remove('active');
+                            searchInput.value = '';
+                        }
+                    });
+                    
+                    // Create result content
+                    let snippet = '';
+                    if (bestMatch.type === 'title') {
+                        snippet = highlightText(section.description, searchTerm) || 
+                                 'Section: ' + highlightText(section.title, searchTerm);
+                    } else if (bestMatch.type === 'description') {
+                        snippet = highlightText(section.description, searchTerm);
+                    } else if (bestMatch.type === 'card-title') {
+                        snippet = 'Card: ' + highlightText(bestMatch.text, searchTerm);
+                    } else {
+                        // For content matches, extract a snippet around the match
+                        const content = section.content;
+                        const matchIndex = content.toLowerCase().indexOf(searchTerm);
+                        const start = Math.max(0, matchIndex - 50);
+                        const end = Math.min(content.length, matchIndex + searchTerm.length + 100);
+                        snippet = '...' + highlightText(content.substring(start, end), searchTerm) + '...';
+                    }
+                    
+                    resultItem.innerHTML = `
+                        <div class="search-result-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="search-result-content">
+                            <div class="search-result-title">${highlightText(section.title, searchTerm)}</div>
+                            <div class="search-result-path">${section.path}</div>
+                            <div class="search-result-snippet">${snippet}</div>
+                        </div>
+                    `;
+                    
+                    searchResults.appendChild(resultItem);
+                });
+                
+                searchResults.classList.add('active');
+            }
+            
+            // Helper function to highlight search terms in text
+            function highlightText(text, searchTerm) {
+                if (!text) return '';
+                
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                return text.replace(regex, '<span class="search-result-highlight">$1</span>');
+            }
+            
+            // Helper function to get section path
+            function getSectionPath(sectionId) {
+                const pathMap = {
+                    'introduction': 'Get Started / Introduction',
+                    'getting-started': 'Get Started / Getting Started',
+                    'endpoints': 'API Reference / API Endpoints',
+                    'implementation': 'API Reference / Implementation',
+                    'usage': 'API Reference / Usage Guidelines',
+                    'use-cases': 'Resources / Use Cases',
+                    'uptime-stats': 'Resources / Uptime Stats',
+                    'example-project': 'Resources / Example Project',
+                    'support': 'Resources / Support & Contact'
+                };
+                
+                return pathMap[sectionId] || 'Documentation';
+            }
+        });
+
+        // Load stats and avatar when page is ready
         if (document.readyState === 'complete') {
             loadUptimeStats();
+            loadBotAvatar();
         } else {
-            window.addEventListener('load', loadUptimeStats);
+            window.addEventListener('load', () => {
+                loadUptimeStats();
+                loadBotAvatar();
+            });
         }
     </script>
 </body>
-
 </html>
